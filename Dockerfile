@@ -26,9 +26,10 @@ ENV FC /opt/rh/devtoolset-2/root/usr/bin/gfortran
 
 # Build and install git from source.
 WORKDIR /usr/src
-ENV GIT_VERSION 2.5.0
-RUN wget https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz && \
-  tar xvzf git-${GIT_VERSION}.tar.gz && \
+ARG GIT_VERSION
+COPY  ./git-${GIT_VERSION}.tar.gz ./git-${GIT_VERSION}.tar.gz
+#RUN wget https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
+RUN tar xvzf git-${GIT_VERSION}.tar.gz && \
   cd git-${GIT_VERSION} && \
   ./configure --prefix=/usr && \
   make && \
@@ -70,6 +71,16 @@ RUN git clone https://github.com/martine/ninja.git && \
   ./configure.py --bootstrap && \
   mv ninja /usr/bin/ && \
   cd .. && rm -rf ninja
+
+# Build and install Libtool 2.4.6
+WORKDIR /usr/src
+RUN yum erase -y libtool && \
+  wget --no-check-certificate http://ftpmirror.gnu.org/libtool/libtool-2.4.6.tar.gz && \
+  tar -xzvf libtool-2.4.6.tar.gz && \
+  cd libtool-2.4.6 && \
+  ./configure && \
+  make && \
+  make install
 
 WORKDIR /usr/src
 CMD /bin/bash
